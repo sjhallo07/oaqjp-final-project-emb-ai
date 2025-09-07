@@ -53,8 +53,14 @@ def emotion_detector(text_to_analyze):
             }
         else:
             # Retornar mensaje de error con el código de estado
-            return f"Error: Received status code {response.status_code}"
+            return {"error": f"Received status code {response.status_code}"}
     
     except requests.exceptions.RequestException as e:
         # Manejar errores de conexión o de solicitud
-        return f"An error occurred: {str(e)}"
+        return {"error": f"An error occurred: {str(e)}"}
+
+# Este bloque debe estar FUERA de la función
+if __name__ == "__main__":
+    # Prueba de la función
+    result = emotion_detector("Me encanta esta nueva tecnología")
+    print(result)
