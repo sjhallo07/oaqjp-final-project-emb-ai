@@ -1,5 +1,10 @@
-let RunSentimentAnalysis = ()=>{
-    textToAnalyze = document.getElementById("textToAnalyze").value;
+let RunSentimentAnalysis = () => {
+    let textToAnalyze = document.getElementById("textToAnalyze").value.trim();
+
+    if (textToAnalyze === "") {
+        alert("Invalid text, please try again.");
+        return;
+    }
 
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -7,6 +12,7 @@ let RunSentimentAnalysis = ()=>{
             document.getElementById("system_response").innerHTML = xhttp.responseText;
         }
     };
-    xhttp.open("GET", "emotionDetector?textToAnalyze"+"="+textToAnalyze, true);
+   
+    xhttp.open("GET", "emotionDetector?textToAnalyze=" + encodeURIComponent(textToAnalyze), true);
     xhttp.send();
-}
+};

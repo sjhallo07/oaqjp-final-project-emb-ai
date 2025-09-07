@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from EmotionDetection.emotion_detection import emotion_detector  
+from EmotionDetection import emotion_detector
 
 app = Flask(__name__)
 
@@ -8,20 +8,31 @@ def index():
     return render_template('index.html')
 
 @app.route('/emotionDetector', methods=['GET', 'POST'])
-def detect_emotion():
-    if request.method == 'GET':
-        text = request.args.get('textToAnalyze')
-    else:
-        text = request.form.get('textToAnalyze')
+def emotion_detector_route():
+   
+    if request.method == 'POST':
+        data = request.get_json()
+        text_to_analyze = data.get('text') if data else None
+    else:  
+        text_to_analyze = request.args.get('text')
+    
+    if not text_to_analyze or text_to_analyze.strip() == "":
+        return jsonify({
+            "error": "¡Texto inválido! ¡Por favor, inténtalo de nuevo!"
+        }), 400
+    
+   
+    result = emotion_detector(text_to_analyze)
+    
+    
+    if 'error' in result:
+        return jsonify({"error": result['error']}), 500
 
-    if not text or text.strip() == '':
-        return jsonify({'error': 'Invalid text! Please try again!'}), 400
-
-    try:
-        result = emotion_detector(text)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    
+    if result['dominant_emotion'] is None:
+        return jsonify({
+            "error": "¡Texto inválido! ¡Por favor, inténtalo de nuevo!"
+        }), 400
     
     
     descriptive_text = f"For the given statement, the system response is 'anger': {result['anger']}, 'disgust': {result['disgust']}, 'fear': {result['fear']}, 'joy': {result['joy']} and 'sadness': {result['sadness']}. The dominant emotion is {result['dominant_emotion']}."
